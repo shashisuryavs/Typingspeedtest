@@ -5,8 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meyta name="description" content="Typing Speed Test Webpage with Enhanced Styling, Accuracy, and Speed Feedback">
     <title>Typing Speed Test</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,6 +23,16 @@
             align-items: center;
             height: 100vh;
             color: #333;
+        }
+        .madeby{
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            animation: fadeIn 1s ease-in-out;
         }
         .container {
             background-color: #fff;
@@ -136,6 +149,8 @@
         }
     </style>
 </head>
+<main>
+<h1 class="madeby">made by Shashi Surya</h1>
 <body>
     <div class="container">
         <h1>🚀 Typing Speed Test</h1>
@@ -161,189 +176,189 @@
             <button onclick="closePopup()">Try Again 🔄</button>
         </div>
     </div>
+</main>
+ <script>
+    const paragraphEl = document.getElementById("paragraph");
+    const typingInput = document.getElementById("typing-input");
+    const timeLeftEl = document.getElementById("time-left");
+    const wordsTypedEl = document.getElementById("words-typed");
+    const accuracyEl = document.getElementById("accuracy");
+    const startButton = document.getElementById("start-button");
+    const resetButton = document.getElementById("reset-button");
+    const resultPopup = document.getElementById("result-popup");
+    const speedResult = document.getElementById("speed-result");
+    const accuracyResult = document.getElementById("accuracy-result");
+    const commentEl = document.getElementById("comment");
 
-    <script>
-        const paragraphEl = document.getElementById("paragraph");
-        const typingInput = document.getElementById("typing-input");
-        const timeLeftEl = document.getElementById("time-left");
-        const wordsTypedEl = document.getElementById("words-typed");
-        const accuracyEl = document.getElementById("accuracy");
-        const startButton = document.getElementById("start-button");
-        const resetButton = document.getElementById("reset-button");
-        const resultPopup = document.getElementById("result-popup");
-        const speedResult = document.getElementById("speed-result");
-        const accuracyResult = document.getElementById("accuracy-result");
-        const commentEl = document.getElementById("comment");
-    
-        let timeLeft = 60;
-        let timer;
-        let isRunning = false;
-        let wordsQueue = [];
-        let currentWordIndex = 0;
-        let totalTypedWords = 0;
-        let totalTypedChars = 0;
-        let correctChars = 0;
-        let totalWordsCorrect = 0;
-        let startTime;
-    
-        const extensiveWordList = [
-            "achievement", "algorithm", "application", "architecture", "artificial", "atmosphere", "automation", "bandwidth", "blueprint", "capability", "circuit", "collaboration", "component", "compression", "configuration", "connectivity", "database", "debugging", "deployment", "design", "digital", "efficiency", "electricity", "encryption", "environment", "framework", "function", "generation", "hardware", "implementation", "infrastructure", "intelligence", "interface", "iteration", "management", "mechanism", "memory", "module", "multimedia", "networking", "optimization", "parameter", "performance", "platform", "processor", "programming", "protocol", "redundancy", "scalability", "simulation", "software", "solution", "storage", "structure", "subsystem", "synthesis", "system", "technology", "template", "throughput", "transaction", "transformation", "transmission", "upgrade", "usability", "validation", "variable", "virtualization", "visibility", "workflow"
-        ];
-    
-        const preloadWords = () => {
-            const selectedWords = [];
-            while (selectedWords.length < 1000) {
-                const randomIndex = Math.floor(Math.random() * extensiveWordList.length);
-                selectedWords.push(extensiveWordList[randomIndex]);
-            }
-            wordsQueue = selectedWords;
-            renderWordsChunk();
-        };
-    
-        const renderWordsChunk = (chunkSize = 20) => {
-            const chunk = wordsQueue.splice(0, chunkSize);
-            const html = chunk.map((word, index) =>
-                `<span class="word ${currentWordIndex === 0 && index === 0 ? 'current' : ''}">${[...word].map(letter => `<span>${letter}</span>`).join("")}</span>`
-            ).join(" ");
-            paragraphEl.innerHTML += " " + html;
-        };
-    
-        const startTest = () => {
-            paragraphEl.innerHTML = "";
-            wordsQueue = [];
-            preloadWords();
-            typingInput.value = "";
-            typingInput.disabled = false;
-            typingInput.focus();
-            timeLeft = 60;
-            wordsTypedEl.textContent = 0;
-            accuracyEl.textContent = 0;
+    let timeLeft = 60;
+    let timer;
+    let isRunning = false;
+    let wordsQueue = [];
+    let currentWordIndex = 0;
+    let totalTypedWords = 0;
+    let totalTypedChars = 0;
+    let correctChars = 0;
+    let totalWordsCorrect = 0;
+    let startTime;
+
+    const extensiveWordList = [
+        "achievement", "algorithm", "application", "architecture", "artificial", "atmosphere", "automation", "bandwidth", "blueprint", "capability", "circuit", "collaboration", "component", "compression", "configuration", "connectivity", "database", "debugging", "deployment", "design", "digital", "efficiency", "electricity", "encryption", "environment", "framework", "function", "generation", "hardware", "implementation", "infrastructure", "intelligence", "interface", "iteration", "management", "mechanism", "memory", "module", "multimedia", "networking", "optimization", "parameter", "performance", "platform", "processor", "programming", "protocol", "redundancy", "scalability", "simulation", "software", "solution", "storage", "structure", "subsystem", "synthesis", "system", "technology", "template", "throughput", "transaction", "transformation", "transmission", "upgrade", "usability", "validation", "variable", "virtualization", "visibility", "workflow"
+    ];
+
+    const preloadWords = () => {
+        const selectedWords = [];
+        while (selectedWords.length < 1000) {
+            const randomIndex = Math.floor(Math.random() * extensiveWordList.length);
+            selectedWords.push(extensiveWordList[randomIndex]);
+        }
+        wordsQueue = selectedWords;
+        renderWordsChunk();
+    };
+
+    const renderWordsChunk = (chunkSize = 20) => {
+        const chunk = wordsQueue.splice(0, chunkSize);
+        const html = chunk.map((word, index) =>
+            `<span class="word ${currentWordIndex === 0 && index === 0 ? 'current' : ''}">${[...word].map(letter => `<span>${letter}</span>`).join("")}</span>`
+        ).join(" ");
+        paragraphEl.innerHTML += " " + html;
+    };
+
+    const startTest = () => {
+        paragraphEl.innerHTML = "";
+        wordsQueue = [];
+        preloadWords();
+        typingInput.value = "";
+        typingInput.disabled = false;
+        typingInput.focus();
+        timeLeft = 60;
+        wordsTypedEl.textContent = 0;
+        accuracyEl.textContent = 0;
+        timeLeftEl.textContent = timeLeft;
+        currentWordIndex = 0;
+        totalTypedWords = 0;
+        totalTypedChars = 0;
+        correctChars = 0;
+        totalWordsCorrect = 0;
+        isRunning = true;
+        startTime = new Date();
+        clearInterval(timer);
+        timer = setInterval(updateTimer, 1000);
+    };
+
+    const resetTest = () => {
+        clearInterval(timer);
+        isRunning = false;
+        paragraphEl.innerHTML = "";
+        typingInput.value = "";
+        typingInput.disabled = true;
+        timeLeftEl.textContent = 60;
+        wordsTypedEl.textContent = 0;
+        accuracyEl.textContent = 0;
+        timeLeft = 60;
+        currentWordIndex = 0;
+        totalTypedWords = 0;
+        totalTypedChars = 0;
+        correctChars = 0;
+        totalWordsCorrect = 0;
+        preloadWords();
+    };
+
+    const updateTimer = () => {
+        if (timeLeft > 0) {
+            timeLeft--;
             timeLeftEl.textContent = timeLeft;
-            currentWordIndex = 0;
-            totalTypedWords = 0;
-            totalTypedChars = 0;
-            correctChars = 0;
-            totalWordsCorrect = 0;
-            isRunning = true;
-            startTime = new Date();
-            clearInterval(timer);
-            timer = setInterval(updateTimer, 1000);
-        };
-    
-        const resetTest = () => {
-            clearInterval(timer);
-            isRunning = false;
-            paragraphEl.innerHTML = "";
-            typingInput.value = "";
-            typingInput.disabled = true;
-            timeLeftEl.textContent = 60;
-            wordsTypedEl.textContent = 0;
-            accuracyEl.textContent = 0;
-            timeLeft = 60;
-            currentWordIndex = 0;
-            totalTypedWords = 0;
-            totalTypedChars = 0;
-            correctChars = 0;
-            totalWordsCorrect = 0;
-            preloadWords();
-        };
-    
-        const updateTimer = () => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                timeLeftEl.textContent = timeLeft;
-                updateAccuracy();
-            } else {
-                clearInterval(timer);
-                endTest();
-            }
-        };
-    
-        const endTest = () => {
-            isRunning = false;
-            typingInput.disabled = true;
-            const endTime = new Date();
-            const timeTaken = (endTime - startTime) / 60000;
-            const wpm = Math.round((totalWordsCorrect) / timeTaken);
-            const accuracyFinal = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
-            speedResult.textContent = wpm;
-            accuracyResult.textContent = accuracyFinal;
-            commentEl.textContent = getFeedback(wpm, accuracyFinal);
-            showPopup();
-        };
-    
-        const getFeedback = (wpm, accuracy) => {
-            if (wpm >= 60 && accuracy >= 90) return "🔥 Superb speed and accuracy! You're a typing master!";
-            if (wpm >= 60 && accuracy >= 79) return "🔥 Superb speed and improve accuracy! ";
-            if (wpm >= 40 && accuracy >= 80) return "💪 Good speed with nice accuracy. Keep pushing!";
-            if (wpm >= 30) return "⚡ Decent speed. Focus on accuracy for better performance.";
-            return "⏳ Keep practicing! Improve both speed and accuracy for great results.";
-        };
-    
-        const showPopup = () => {
-            resultPopup.classList.add("show");
-        };
-    
-        const closePopup = () => {
-            resultPopup.classList.remove("show");
-        };
-    
-        const updateAccuracy = () => {
-            const accuracy = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
-            accuracyEl.textContent = accuracy;
-        };
-    
-        const moveToNextWord = (inputWord) => {
-            const wordsEls = paragraphEl.querySelectorAll(".word");
-            const expectedWord = wordsEls[currentWordIndex]?.innerText || "";
-    
-            totalTypedWords++;
-            totalTypedChars += inputWord.trim().length;
-            const correctCharCount = [...inputWord.trim()].filter((char, i) => char === expectedWord[i]).length;
-            correctChars += correctCharCount;
-    
-            if (inputWord.trim() === expectedWord) totalWordsCorrect++;
-    
-            wordsTypedEl.textContent = totalTypedWords;
-            wordsEls[currentWordIndex]?.classList.remove("current");
-            currentWordIndex++;
-    
-            if (currentWordIndex >= wordsEls.length - 5 && wordsQueue.length > 0) {
-                renderWordsChunk();
-            }
-    
-            if (currentWordIndex < wordsEls.length) {
-                wordsEls[currentWordIndex]?.classList.add("current");
-                wordsEls[currentWordIndex]?.scrollIntoView({ behavior: "smooth", block: "center" }); // Auto-scroll to current word
-            }
-    
-            typingInput.value = "";
             updateAccuracy();
-        };
-    
-        const highlightInput = () => {
-            const inputText = typingInput.value;
-            const wordsEls = paragraphEl.querySelectorAll(".word");
-            const currentWordEl = wordsEls[currentWordIndex];
-            const spans = currentWordEl?.querySelectorAll("span") || [];
-    
-            spans.forEach((span, i) => {
-                if (inputText[i] == null) span.className = "";
-                else if (inputText[i] === span.textContent) span.className = "correct";
-                else span.className = "incorrect";
-            });
-    
-            if (inputText.endsWith(" ")) moveToNextWord(inputText);
-        };
-    
-        startButton.addEventListener("click", startTest);
-        resetButton.addEventListener("click", resetTest);
-        typingInput.addEventListener("input", () => {
-            if (!isRunning) startTest();
-            highlightInput();
+        } else {
+            clearInterval(timer);
+            endTest();
+        }
+    };
+
+    const endTest = () => {
+        isRunning = false;
+        typingInput.disabled = true;
+        const endTime = new Date();
+        const timeTaken = (endTime - startTime) / 60000;
+        const wpm = Math.round((totalWordsCorrect) / timeTaken);
+        const accuracyFinal = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
+        speedResult.textContent = wpm;
+        accuracyResult.textContent = accuracyFinal;
+        commentEl.textContent = getFeedback(wpm, accuracyFinal);
+        showPopup();
+    };
+
+    const getFeedback = (wpm, accuracy) => {
+        if (wpm >= 60 && accuracy >= 90) return "🔥 Superb speed and accuracy! You're a typing master!";
+        if (wpm >= 60 && accuracy >= 79) return "🔥 Superb speed and improve accuracy! ";
+        if (wpm >= 40 && accuracy >= 80) return "💪 Good speed with nice accuracy. Keep pushing!";
+        if (wpm >= 30) return "⚡ Decent speed. Focus on accuracy for better performance.";
+        return "⏳ Keep practicing! Improve both speed and accuracy for great results.";
+    };
+
+    const showPopup = () => {
+        resultPopup.classList.add("show");
+    };
+
+    const closePopup = () => {
+        resultPopup.classList.remove("show");
+    };
+
+    const updateAccuracy = () => {
+        const accuracy = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
+        accuracyEl.textContent = accuracy;
+    };
+
+    const moveToNextWord = (inputWord) => {
+        const wordsEls = paragraphEl.querySelectorAll(".word");
+        const expectedWord = wordsEls[currentWordIndex]?.innerText || "";
+
+        totalTypedWords++;
+        totalTypedChars += inputWord.trim().length;
+        const correctCharCount = [...inputWord.trim()].filter((char, i) => char === expectedWord[i]).length;
+        correctChars += correctCharCount;
+
+        if (inputWord.trim() === expectedWord) totalWordsCorrect++;
+
+        wordsTypedEl.textContent = totalTypedWords;
+        wordsEls[currentWordIndex]?.classList.remove("current");
+        currentWordIndex++;
+
+        if (currentWordIndex >= wordsEls.length - 5 && wordsQueue.length > 0) {
+            renderWordsChunk();
+        }
+
+        if (currentWordIndex < wordsEls.length) {
+            wordsEls[currentWordIndex]?.classList.add("current");
+            wordsEls[currentWordIndex]?.scrollIntoView({ behavior: "smooth", block: "center" }); // Auto-scroll to current word
+        }
+
+        typingInput.value = "";
+        updateAccuracy();
+    };
+
+    const highlightInput = () => {
+        const inputText = typingInput.value;
+        const wordsEls = paragraphEl.querySelectorAll(".word");
+        const currentWordEl = wordsEls[currentWordIndex];
+        const spans = currentWordEl?.querySelectorAll("span") || [];
+
+        spans.forEach((span, i) => {
+            if (inputText[i] == null) span.className = "";
+            else if (inputText[i] === span.textContent) span.className = "correct";
+            else span.className = "incorrect";
         });
-    
-        window.onload = preloadWords;
-    </script>
+
+        if (inputText.endsWith(" ")) moveToNextWord(inputText);
+    };
+
+    startButton.addEventListener("click", startTest);
+    resetButton.addEventListener("click", resetTest);
+    typingInput.addEventListener("input", () => {
+        if (!isRunning) startTest();
+        highlightInput();
+    });
+
+    window.onload = preloadWords;
+</script>
 </body>
 </html>
