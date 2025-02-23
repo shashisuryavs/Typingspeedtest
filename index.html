@@ -174,7 +174,7 @@
         const speedResult = document.getElementById("speed-result");
         const accuracyResult = document.getElementById("accuracy-result");
         const commentEl = document.getElementById("comment");
-
+    
         let timeLeft = 60;
         let timer;
         let isRunning = false;
@@ -185,12 +185,11 @@
         let correctChars = 0;
         let totalWordsCorrect = 0;
         let startTime;
-
+    
         const extensiveWordList = [
-"achievement", "algorithm", "application", "architecture", "artificial", "atmosphere", "automation", "bandwidth", "blueprint", "capability", "circuit", "collaboration", "component", "compression", "configuration", "connectivity", "database", "debugging", "deployment", "design", "digital", "efficiency", "electricity", "encryption", "environment", "framework", "function", "generation", "hardware", "implementation", "infrastructure", "intelligence", "interface", "iteration", "management", "mechanism", "memory", "module", "multimedia", "networking", "optimization", "parameter", "performance", "platform", "processor", "programming", "protocol", "redundancy", "scalability", "simulation", "software", "solution", "storage", "structure", "subsystem", "synthesis", "system", "technology", "template", "throughput", "transaction", "transformation", "transmission", "upgrade", "usability", "validation", "variable", "virtualization", "visibility", "workflow"
-
+            "achievement", "algorithm", "application", "architecture", "artificial", "atmosphere", "automation", "bandwidth", "blueprint", "capability", "circuit", "collaboration", "component", "compression", "configuration", "connectivity", "database", "debugging", "deployment", "design", "digital", "efficiency", "electricity", "encryption", "environment", "framework", "function", "generation", "hardware", "implementation", "infrastructure", "intelligence", "interface", "iteration", "management", "mechanism", "memory", "module", "multimedia", "networking", "optimization", "parameter", "performance", "platform", "processor", "programming", "protocol", "redundancy", "scalability", "simulation", "software", "solution", "storage", "structure", "subsystem", "synthesis", "system", "technology", "template", "throughput", "transaction", "transformation", "transmission", "upgrade", "usability", "validation", "variable", "virtualization", "visibility", "workflow"
         ];
-
+    
         const preloadWords = () => {
             const selectedWords = [];
             while (selectedWords.length < 1000) {
@@ -200,7 +199,7 @@
             wordsQueue = selectedWords;
             renderWordsChunk();
         };
-
+    
         const renderWordsChunk = (chunkSize = 20) => {
             const chunk = wordsQueue.splice(0, chunkSize);
             const html = chunk.map((word, index) =>
@@ -208,7 +207,7 @@
             ).join(" ");
             paragraphEl.innerHTML += " " + html;
         };
-
+    
         const startTest = () => {
             paragraphEl.innerHTML = "";
             wordsQueue = [];
@@ -230,7 +229,7 @@
             clearInterval(timer);
             timer = setInterval(updateTimer, 1000);
         };
-
+    
         const resetTest = () => {
             clearInterval(timer);
             isRunning = false;
@@ -248,7 +247,7 @@
             totalWordsCorrect = 0;
             preloadWords();
         };
-
+    
         const updateTimer = () => {
             if (timeLeft > 0) {
                 timeLeft--;
@@ -259,7 +258,7 @@
                 endTest();
             }
         };
-
+    
         const endTest = () => {
             isRunning = false;
             typingInput.disabled = true;
@@ -272,7 +271,7 @@
             commentEl.textContent = getFeedback(wpm, accuracyFinal);
             showPopup();
         };
-
+    
         const getFeedback = (wpm, accuracy) => {
             if (wpm >= 60 && accuracy >= 90) return "🔥 Superb speed and accuracy! You're a typing master!";
             if (wpm >= 60 && accuracy >= 79) return "🔥 Superb speed and improve accuracy! ";
@@ -280,69 +279,70 @@
             if (wpm >= 30) return "⚡ Decent speed. Focus on accuracy for better performance.";
             return "⏳ Keep practicing! Improve both speed and accuracy for great results.";
         };
-
+    
         const showPopup = () => {
             resultPopup.classList.add("show");
         };
-
+    
         const closePopup = () => {
             resultPopup.classList.remove("show");
         };
-
+    
         const updateAccuracy = () => {
             const accuracy = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
             accuracyEl.textContent = accuracy;
         };
-
+    
         const moveToNextWord = (inputWord) => {
             const wordsEls = paragraphEl.querySelectorAll(".word");
             const expectedWord = wordsEls[currentWordIndex]?.innerText || "";
-
+    
             totalTypedWords++;
             totalTypedChars += inputWord.trim().length;
             const correctCharCount = [...inputWord.trim()].filter((char, i) => char === expectedWord[i]).length;
             correctChars += correctCharCount;
-
+    
             if (inputWord.trim() === expectedWord) totalWordsCorrect++;
-
+    
             wordsTypedEl.textContent = totalTypedWords;
             wordsEls[currentWordIndex]?.classList.remove("current");
             currentWordIndex++;
-
+    
             if (currentWordIndex >= wordsEls.length - 5 && wordsQueue.length > 0) {
                 renderWordsChunk();
             }
-
+    
             if (currentWordIndex < wordsEls.length) {
                 wordsEls[currentWordIndex]?.classList.add("current");
+                wordsEls[currentWordIndex]?.scrollIntoView({ behavior: "smooth", block: "center" }); // Auto-scroll to current word
             }
-
+    
             typingInput.value = "";
             updateAccuracy();
         };
-
+    
         const highlightInput = () => {
             const inputText = typingInput.value;
             const wordsEls = paragraphEl.querySelectorAll(".word");
             const currentWordEl = wordsEls[currentWordIndex];
             const spans = currentWordEl?.querySelectorAll("span") || [];
-
+    
             spans.forEach((span, i) => {
                 if (inputText[i] == null) span.className = "";
                 else if (inputText[i] === span.textContent) span.className = "correct";
                 else span.className = "incorrect";
             });
-
+    
             if (inputText.endsWith(" ")) moveToNextWord(inputText);
         };
-
+    
         startButton.addEventListener("click", startTest);
         resetButton.addEventListener("click", resetTest);
         typingInput.addEventListener("input", () => {
             if (!isRunning) startTest();
             highlightInput();
         });
-
+    
         window.onload = preloadWords;
     </script>
 </body>
