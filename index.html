@@ -1,0 +1,349 @@
+<!-- Typing Speed Test Webpage with Enhanced Styling, Accuracy, and Speed Feedback -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .paragraph {
+            margin-bottom: 30px;
+            font-size: 20px;
+            color: #555;
+            text-align: justify;
+            line-height: 1.8;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background-color: #fafafa;
+            overflow-y: auto;
+            max-height: 180px;
+        }
+        .word span.correct { color: #4caf50; font-weight: bold; }
+        .word span.incorrect { color: #e53935; }
+        .word.current { background-color: #e3f2fd; border-radius: 5px; padding: 0 3px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #4facfe;
+            outline: none;
+        }
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+        }
+        button {
+            padding: 12px 30px;
+            background-color: #4facfe;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #00c6fb; }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+        .popup-content {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.5s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .popup.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .popup-content h2 { font-size: 2rem; color: #333; }
+        .popup-content p { font-size: 1.2rem; margin: 15px 0; }
+        .popup-content button {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #4caf50;
+        }
+        .popup-content button:hover {
+            background-color: #43a047;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Typing Speed Test</h1>
+        <div class="paragraph" id="paragraph"></div>
+        <input type="text" id="typing-input" placeholder="Start typing here..." disabled>
+        <div class="stats">
+            <p>⏳ Time Left: <span id="time-left">60</span>s</p>
+            <p>📝 Words Typed: <span id="words-typed">0</span></p>
+            <p>🎯 Accuracy: <span id="accuracy">0</span>%</p>
+        </div>
+        <div class="button-group">
+            <button id="start-button">Start Test</button>
+            <button id="reset-button">Reset</button>
+        </div>
+    </div>
+
+    <div class="popup" id="result-popup">
+        <div class="popup-content">
+            <h2>✨ Test Results</h2>
+            <p>🚀 Speed: <span id="speed-result"></span> WPM</p>
+            <p>🎯 Accuracy: <span id="accuracy-result"></span>%</p>
+            <p id="comment"></p>
+            <button onclick="closePopup()">Try Again 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const paragraphEl = document.getElementById("paragraph");
+        const typingInput = document.getElementById("typing-input");
+        const timeLeftEl = document.getElementById("time-left");
+        const wordsTypedEl = document.getElementById("words-typed");
+        const accuracyEl = document.getElementById("accuracy");
+        const startButton = document.getElementById("start-button");
+        const resetButton = document.getElementById("reset-button");
+        const resultPopup = document.getElementById("result-popup");
+        const speedResult = document.getElementById("speed-result");
+        const accuracyResult = document.getElementById("accuracy-result");
+        const commentEl = document.getElementById("comment");
+
+        let timeLeft = 60;
+        let timer;
+        let isRunning = false;
+        let wordsQueue = [];
+        let currentWordIndex = 0;
+        let totalTypedWords = 0;
+        let totalTypedChars = 0;
+        let correctChars = 0;
+        let totalWordsCorrect = 0;
+        let startTime;
+
+        const extensiveWordList = [
+"achievement", "algorithm", "application", "architecture", "artificial", "atmosphere", "automation", "bandwidth", "blueprint", "capability", "circuit", "collaboration", "component", "compression", "configuration", "connectivity", "database", "debugging", "deployment", "design", "digital", "efficiency", "electricity", "encryption", "environment", "framework", "function", "generation", "hardware", "implementation", "infrastructure", "intelligence", "interface", "iteration", "management", "mechanism", "memory", "module", "multimedia", "networking", "optimization", "parameter", "performance", "platform", "processor", "programming", "protocol", "redundancy", "scalability", "simulation", "software", "solution", "storage", "structure", "subsystem", "synthesis", "system", "technology", "template", "throughput", "transaction", "transformation", "transmission", "upgrade", "usability", "validation", "variable", "virtualization", "visibility", "workflow"
+
+        ];
+
+        const preloadWords = () => {
+            const selectedWords = [];
+            while (selectedWords.length < 1000) {
+                const randomIndex = Math.floor(Math.random() * extensiveWordList.length);
+                selectedWords.push(extensiveWordList[randomIndex]);
+            }
+            wordsQueue = selectedWords;
+            renderWordsChunk();
+        };
+
+        const renderWordsChunk = (chunkSize = 20) => {
+            const chunk = wordsQueue.splice(0, chunkSize);
+            const html = chunk.map((word, index) =>
+                `<span class="word ${currentWordIndex === 0 && index === 0 ? 'current' : ''}">${[...word].map(letter => `<span>${letter}</span>`).join("")}</span>`
+            ).join(" ");
+            paragraphEl.innerHTML += " " + html;
+        };
+
+        const startTest = () => {
+            paragraphEl.innerHTML = "";
+            wordsQueue = [];
+            preloadWords();
+            typingInput.value = "";
+            typingInput.disabled = false;
+            typingInput.focus();
+            timeLeft = 60;
+            wordsTypedEl.textContent = 0;
+            accuracyEl.textContent = 0;
+            timeLeftEl.textContent = timeLeft;
+            currentWordIndex = 0;
+            totalTypedWords = 0;
+            totalTypedChars = 0;
+            correctChars = 0;
+            totalWordsCorrect = 0;
+            isRunning = true;
+            startTime = new Date();
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+        };
+
+        const resetTest = () => {
+            clearInterval(timer);
+            isRunning = false;
+            paragraphEl.innerHTML = "";
+            typingInput.value = "";
+            typingInput.disabled = true;
+            timeLeftEl.textContent = 60;
+            wordsTypedEl.textContent = 0;
+            accuracyEl.textContent = 0;
+            timeLeft = 60;
+            currentWordIndex = 0;
+            totalTypedWords = 0;
+            totalTypedChars = 0;
+            correctChars = 0;
+            totalWordsCorrect = 0;
+            preloadWords();
+        };
+
+        const updateTimer = () => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                timeLeftEl.textContent = timeLeft;
+                updateAccuracy();
+            } else {
+                clearInterval(timer);
+                endTest();
+            }
+        };
+
+        const endTest = () => {
+            isRunning = false;
+            typingInput.disabled = true;
+            const endTime = new Date();
+            const timeTaken = (endTime - startTime) / 60000;
+            const wpm = Math.round((totalWordsCorrect) / timeTaken);
+            const accuracyFinal = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
+            speedResult.textContent = wpm;
+            accuracyResult.textContent = accuracyFinal;
+            commentEl.textContent = getFeedback(wpm, accuracyFinal);
+            showPopup();
+        };
+
+        const getFeedback = (wpm, accuracy) => {
+            if (wpm >= 60 && accuracy >= 90) return "🔥 Superb speed and accuracy! You're a typing master!";
+            if (wpm >= 60 && accuracy >= 79) return "🔥 Superb speed and improve accuracy! ";
+            if (wpm >= 40 && accuracy >= 80) return "💪 Good speed with nice accuracy. Keep pushing!";
+            if (wpm >= 30) return "⚡ Decent speed. Focus on accuracy for better performance.";
+            return "⏳ Keep practicing! Improve both speed and accuracy for great results.";
+        };
+
+        const showPopup = () => {
+            resultPopup.classList.add("show");
+        };
+
+        const closePopup = () => {
+            resultPopup.classList.remove("show");
+        };
+
+        const updateAccuracy = () => {
+            const accuracy = totalTypedChars === 0 ? 0 : Math.round((correctChars / totalTypedChars) * 100);
+            accuracyEl.textContent = accuracy;
+        };
+
+        const moveToNextWord = (inputWord) => {
+            const wordsEls = paragraphEl.querySelectorAll(".word");
+            const expectedWord = wordsEls[currentWordIndex]?.innerText || "";
+
+            totalTypedWords++;
+            totalTypedChars += inputWord.trim().length;
+            const correctCharCount = [...inputWord.trim()].filter((char, i) => char === expectedWord[i]).length;
+            correctChars += correctCharCount;
+
+            if (inputWord.trim() === expectedWord) totalWordsCorrect++;
+
+            wordsTypedEl.textContent = totalTypedWords;
+            wordsEls[currentWordIndex]?.classList.remove("current");
+            currentWordIndex++;
+
+            if (currentWordIndex >= wordsEls.length - 5 && wordsQueue.length > 0) {
+                renderWordsChunk();
+            }
+
+            if (currentWordIndex < wordsEls.length) {
+                wordsEls[currentWordIndex]?.classList.add("current");
+            }
+
+            typingInput.value = "";
+            updateAccuracy();
+        };
+
+        const highlightInput = () => {
+            const inputText = typingInput.value;
+            const wordsEls = paragraphEl.querySelectorAll(".word");
+            const currentWordEl = wordsEls[currentWordIndex];
+            const spans = currentWordEl?.querySelectorAll("span") || [];
+
+            spans.forEach((span, i) => {
+                if (inputText[i] == null) span.className = "";
+                else if (inputText[i] === span.textContent) span.className = "correct";
+                else span.className = "incorrect";
+            });
+
+            if (inputText.endsWith(" ")) moveToNextWord(inputText);
+        };
+
+        startButton.addEventListener("click", startTest);
+        resetButton.addEventListener("click", resetTest);
+        typingInput.addEventListener("input", () => {
+            if (!isRunning) startTest();
+            highlightInput();
+        });
+
+        window.onload = preloadWords;
+    </script>
+</body>
+</html>
